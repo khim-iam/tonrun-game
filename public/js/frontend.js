@@ -1,278 +1,262 @@
-const canvas = document.querySelector('canvas')
-const c = canvas.getContext('2d')
+const canvas = document.querySelector('canvas');
+const c = canvas.getContext('2d');
 
-const socket = io()
+const socket = io();
 
-const devicepixelratio = window.devicePixelRatio || 1
+const devicepixelratio = window.devicePixelRatio || 1;
 
-canvas.width = innerWidth * devicepixelratio
-canvas.height = innerHeight * devicepixelratio
+canvas.width = innerWidth * devicepixelratio;
+canvas.height = innerHeight * devicepixelratio;
 
-const x = canvas.width / 2
-const y = canvas.height / 2
+const x = canvas.width / 2;
+const y = canvas.height / 2;
 
-const frontendplayers = {}
-const frontendcoins={}
-const frontendpowerups = {}
-let selectedPowerUp = null
-const powerupused={
-  speed:false,
-  slow:false,
-  freeze:false
-}
+const frontendplayers = {};
+const frontendcoins = {};
+const frontendpowerups = {};
+let selectedPowerUp = null;
+const powerupused = {
+  speed: false,
+  slow: false,
+  freeze: false
+};
+
+
+
+const countdownElement = document.getElementById('countdown');
+
+socket.on('countdown', (countdown) => {
+  if (countdown === 'Go!') {
+    countdownElement.innerText = countdown;
+    setTimeout(() => {
+      countdownElement.innerText = '';
+    }, 1000);
+  } else {
+    countdownElement.innerText = countdown;
+  }
+});
+
+
 
 document.querySelectorAll('.power-up').forEach(button => {
   button.addEventListener('click', () => {
-    selectedPowerUp = button.getAttribute('data-type')
-    if(!powerupused[selectedPowerUp]){      
-      powerupused[selectedPowerUp]=true      
+    const type = button.getAttribute('data-type');
+    if (powerupused[type]) {
+      selectedPowerUp = null;
+      powerupused[type] = false;
+    } else {
+      selectedPowerUp = type;
+      powerupused[type] = true;
     }
-    else{
-      selectedPowerUp=null
-    }
-    console.log(selectedPowerUp)
-    console.log(powerupused)
-  })
-})
+  });
+});
 
 canvas.addEventListener('click', (event) => {
   if (selectedPowerUp) {
-    //const rect = canvas.getBoundingClientRect()
-    const x = event.clientX * devicepixelratio
-    const y = event.clientY * devicepixelratio
-
-    socket.emit('placePowerUp', { type: selectedPowerUp, x, y })
-    selectedPowerUp = null
+    const x = event.clientX * devicepixelratio;
+    const y = event.clientY * devicepixelratio;
+    socket.emit('placePowerUp', { type: selectedPowerUp, x, y });
+    selectedPowerUp = null;
   }
-})
+});
 
 socket.on('updatePowerUps', (backendpowerups) => {
   for (const id in backendpowerups) {
-    const powerup = backendpowerups[id]
+    const powerup = backendpowerups[id];
     if (!frontendpowerups[id]) {
       frontendpowerups[id] = new Powerup({
         x: powerup.x,
         y: powerup.y,
         radius: 20,
-        type: powerup.type,
-      })
+        type: powerup.type
+      });
     }
   }
   for (const id in frontendpowerups) {
     if (!backendpowerups[id]) {
-      delete frontendpowerups[id]
+      delete frontendpowerups[id];
     }
   }
-})
-
+});
 
 socket.on('connect', () => {
   socket.emit('initcanvas', {
-    widht: canvas.width,
+    width: canvas.width,
     height: canvas.height,
     devicepixelratio
-  })
-})
+  });
+});
 
-const colorarr=['gray','gray','gray','gray','yellow','yellow','yellow','green','green','cyan']
+const colorarr = ['gray', 'gray', 'gray', 'gray', 'yellow', 'yellow', 'yellow', 'green', 'green', 'cyan'];
 
-socket.on('updatecoins',(backendcoins)=>{
-  for(const id in backendcoins){
-    const coin = backendcoins[id]
-    if(!frontendcoins[id]){
-      frontendcoins[id]=new Coin({
-        x:coin.x,
-        y:coin.y,
-        radius:15,
-        color:colorarr[(coin.colornum)%10],
-      })
+socket.on('updateCoins', (backendcoins) => {
+  console.log(1000000)
+  for (const id in backendcoins) {
+    const coin = backendcoins[id];
+    if (!frontendcoins[id]) {
+      frontendcoins[id] = new Coin({
+        x: coin.x,
+        y: coin.y,
+        radius: 15,
+        color: colorarr[(coin.colornum) % 10]
+      });
     }
   }
   for (const id in frontendcoins) {
     if (!backendcoins[id]) {
-      delete frontendcoins[id]
+      delete frontendcoins[id];
     }
   }
-})
+});
 
 socket.on('updatePlayers', (backendplayers) => {
   for (const id in backendplayers) {
-    const backendplayer = backendplayers[id]
+    const backendplayer = backendplayers[id];
     if (!frontendplayers[id]) {
       frontendplayers[id] = new Player({
         x: backendplayer.x,
         y: backendplayer.y,
         radius: 10,
         color: backendplayer.color
-      })
-      document.querySelector(
-        '#playerlabels'
-      ).innerHTML += `<div data-id="${id}" data-score="${backendplayer.score}">${id} :${backendplayer.score} </div>`
+      });
+      document.querySelector('#playerlabels').innerHTML += `<div data-id="${id}" data-score="${backendplayer.score}">${id} :${backendplayer.score} </div>`;
     } else {
-      document.querySelector(
-        `div[data-id=${id}]`
-      ).innerHTML = `${id} :${backendplayer.score}`
-      //  document.querySelector(`div[data-id=${id}]`).setAttribute('data-score',backendplayer.score)
-
-      //  const parentdiv=document.querySelector('#playerlabels')
-      // const childdivs=Array.from(parentdiv.querySelectorAll('div'))
-      // childdivs.sort((a,b)=>{
-      //   const scorea=Number(a.getAttribute('data-score'))
-      //   const scoreb=Number(b.getAttribute('data-score'))
-      //   return scoreb-scoreas
-      // })
-      // childdivs.forEach(div=>{
-      //   parentdiv.removeChild(div)
-      // })
-      // childdivs.forEach((div)=>{
-      //   parentdiv.appendChild(div)
-      // })
-
+      document.querySelector(`div[data-id=${id}]`).innerHTML = `${id} :${backendplayer.score}`;
       if (id === socket.id) {
-        frontendplayers[id].x = backendplayer.x
-        frontendplayers[id].y = backendplayer.y
+        frontendplayers[id].x = backendplayer.x;
+        frontendplayers[id].y = backendplayer.y;
 
-        const lastbackendinputindex = playerinputs.findIndex((input) => {
-          return backendplayer.sequencenumber === input.sequencenumber
-        })
+        const lastbackendinputindex = playerinputs.findIndex((input) => backendplayer.sequencenumber === input.sequencenumber);
 
         if (lastbackendinputindex > -1) {
-          playerinputs.splice(0, lastbackendinputindex + 1)
+          playerinputs.splice(0, lastbackendinputindex + 1);
         }
 
         playerinputs.forEach((input) => {
-          frontendplayers[id].x += input.dx
-          frontendplayers[id].y += input.dy
-        })
+          frontendplayers[id].x += input.dx;
+          frontendplayers[id].y += input.dy;
+        });
       } else {
-        frontendplayers[id].x = backendplayer.x
-        frontendplayers[id].y = backendplayer.y
+        frontendplayers[id].x = backendplayer.x;
+        frontendplayers[id].y = backendplayer.y;
 
         gsap.to(frontendplayers[id], {
           x: backendplayer.x,
           y: backendplayer.y,
-          duaration: 0.015,
+          duration: 0.015,
           ease: 'linear'
-        })
+        });
       }
     }
   }
 
   for (const id in frontendplayers) {
     if (!backendplayers[id]) {
-      const divtodelete = document.querySelector(`div[data-id=${id}]`)
-      divtodelete.parentNode.removeChild(divtodelete)
-      delete frontendplayers[id]
+      const divtodelete = document.querySelector(`div[data-id=${id}]`);
+      divtodelete.parentNode.removeChild(divtodelete);
+      delete frontendplayers[id];
     }
   }
-})
+});
 
-let animationId
+let animationId;
 
 function animate() {
-  animationId = requestAnimationFrame(animate)
-  c.fillStyle = 'rgba(0, 0, 0, 0.1)'
-  c.fillRect(0, 0, canvas.width, canvas.height)
+  animationId = requestAnimationFrame(animate);
+  c.fillStyle = 'rgba(0, 0, 0, 0.1)';
+  c.fillRect(0, 0, canvas.width, canvas.height);
 
   for (const id in frontendplayers) {
-    const player = frontendplayers[id]
-    player.draw()
+    frontendplayers[id].draw();
   }
 
   for (const id in frontendcoins) {
-    const coin = frontendcoins[id]
-    coin.draw()
+    frontendcoins[id].draw();
   }
 
   for (const id in frontendpowerups) {
-    const powerup = frontendpowerups[id]
-    powerup.draw()
+    frontendpowerups[id].draw();
   }
-
 }
 
-animate()
+animate();
 
 const keys = {
-  w: {
-    pressed: false
-  },
-  a: {
-    pressed: false
-  },
-  s: {
-    pressed: false
-  },
-  d: {
-    pressed: false
-  }
-}
+  w: { pressed: false },
+  a: { pressed: false },
+  s: { pressed: false },
+  d: { pressed: false }
+};
 
-const speed = 10
-const playerinputs = []
-let sequencenumber = 0
+const speed = 10;
+const playerinputs = [];
+let sequencenumber = 0;
 
 setInterval(() => {
   if (keys.w.pressed) {
-    sequencenumber++
-    playerinputs.push({ sequencenumber, dx: 0, dy: -speed })
-    frontendplayers[socket.id].y -= 10
-    socket.emit('keydown', { keycode: 'KeyW', sequencenumber })
+    sequencenumber++;
+    playerinputs.push({ sequencenumber, dx: 0, dy: -speed });
+    frontendplayers[socket.id].y -= speed;
+    socket.emit('keydown', { keycode: 'KeyW', sequencenumber });
   }
   if (keys.a.pressed) {
-    sequencenumber++
-    playerinputs.push({ sequencenumber, dx: -speed, dy: 0 })
-    frontendplayers[socket.id].x -= 10
-    socket.emit('keydown', { keycode: 'KeyA', sequencenumber })
+    sequencenumber++;
+    playerinputs.push({ sequencenumber, dx: -speed, dy: 0 });
+    frontendplayers[socket.id].x -= speed;
+    socket.emit('keydown', { keycode: 'KeyA', sequencenumber });
   }
   if (keys.s.pressed) {
-    sequencenumber++
-    playerinputs.push({ sequencenumber, dx: 0, dy: speed })
-    frontendplayers[socket.id].y += 10
-    socket.emit('keydown', { keycode: 'KeyS', sequencenumber })
+    sequencenumber++;
+    playerinputs.push({ sequencenumber, dx: 0, dy: speed });
+    frontendplayers[socket.id].y += speed;
+    socket.emit('keydown', { keycode: 'KeyS', sequencenumber });
   }
   if (keys.d.pressed) {
-    sequencenumber++
-    playerinputs.push({ sequencenumber, dx: speed, dy: 0 })
-    frontendplayers[socket.id].x += 10
-    socket.emit('keydown', { keycode: 'KeyD', sequencenumber })
+    sequencenumber++;
+    playerinputs.push({ sequencenumber, dx: speed, dy: 0 });
+    frontendplayers[socket.id].x += speed;
+    socket.emit('keydown', { keycode: 'KeyD', sequencenumber });
   }
-}, 15)
+}, 15);
 
 window.addEventListener('keydown', (e) => {
-  if (!frontendplayers[socket.id]) return
+  if (!frontendplayers[socket.id]) return;
 
   switch (e.code) {
     case 'KeyW':
-      keys.w.pressed = true
-      break
+      keys.w.pressed = true;
+      break;
     case 'KeyA':
-      keys.a.pressed = true
-      break
+      keys.a.pressed = true;
+      break;
     case 'KeyS':
-      keys.s.pressed = true
-      break
+      keys.s.pressed = true;
+      break;
     case 'KeyD':
-      keys.d.pressed = true
-      break
+      keys.d.pressed = true;
+      break;
   }
-})
+});
 
 window.addEventListener('keyup', (e) => {
-  if (!frontendplayers[socket.id]) return
+  if (!frontendplayers[socket.id]) return;
 
   switch (e.code) {
     case 'KeyW':
-      keys.w.pressed = false
-      break
+      keys.w.pressed = false;
+      break;
     case 'KeyA':
-      keys.a.pressed = false
-      break
+      keys.a.pressed = false;
+      break;
     case 'KeyS':
-      keys.s.pressed = false
-      break
+      keys.s.pressed = false;
+      break;
     case 'KeyD':
-      keys.d.pressed = false
-      break
+      keys.d.pressed = false;
+      break;
   }
-})
+});
+
+setInterval(() => {
+  console.log(frontendcoins)
+}, 5000);

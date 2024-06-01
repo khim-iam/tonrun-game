@@ -1,207 +1,230 @@
-const express = require('express')
-const app = express()
+const express = require('express');
+// const cors = require('cors');
 
-const http = require('http') //socket.io
-const server = http.createServer(app)
+const app = express();
 
-const { Server } = require('socket.io')
-const { setInterval } = require('timers')
-const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000 })
+const http = require('http'); //socket.io
+const server = http.createServer(app);
 
-const port = 3000
+const { Server } = require('socket.io');
+const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000 });
 
-app.use(express.static('public'))
+const port = 3000;
+
+// app.use(cors());
+
+app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html')
-})
+  res.sendFile(__dirname + '/index.html');
+});
 
-const backendplayers = {}
+const instances = [];
+let instanceIdCounter = 0;
 
-let backendcoins={}
-let coinid=0
-const coinradius=15
+const createInstance = () => {
+  const instance = {
+    id: instanceIdCounter++,
+    players: {},
+    coins: {},
+    coinId: 0,
+    coinRadius: 15,
+    powerUps: {},
+    powerUpId: 0,
+    powerUpRadius: 20,
+    coinSpawnInterval: null,
+    //
+    countdown: null
+  };
 
-const backendpowerups={}
-let powerupid = 0
-const powerupradius = 20
-
-const spawnintervalid=setInterval(() => {
-  if(Object.keys(backendplayers).length>0){
-      coinid++
-      backendcoins[coinid]={
-        x:100 + Math.random()*(1600),
-        y:100 + Math.random()*(700),
-        colornum: Math.ceil(Math.random()*100),
-        isdouble:false
+  instance.coinSpawnInterval = setInterval(() => {
+    if (Object.keys(instance.players).length > 2) {
+      instance.coinId++;
+      instance.coins[instance.coinId] = {
+        x: 100 + Math.random() * 1600,
+        y: 100 + Math.random() * 700,
+        colornum: Math.ceil(Math.random() * 100),
+        isdouble: false
       }
-      //console.log(backendcoins)
-  }
-  else{
-    coinid=0
-    backendcoins={}
-  }
-  //console.log(backendpowerups)
-}, 2000);
+      setTimeout(() => {
+          clearInterval(instance.coinSpawnInterval)
+      }, 60000);
+    }
+    // } else {
+    //   instance.coinId = 0;
+    //   instance.coins = {};
+    // }
+  }, 2000);
 
+  
 
-setInterval(() => {
-  clearInterval(spawnintervalid)
-}, 60000);
-
-
-
+  instances.push(instance);
+  return instance;
+};
 
 io.on('connection', (socket) => {
+  let currentInstance;
 
-  console.log('a user connected')
+  if (instances.length === 0 || Object.keys(instances[instances.length - 1].players).length === 3) {
+    currentInstance = createInstance();
+  } else {
+    currentInstance = instances[instances.length - 1];
+  }
 
+  console.log(`Player ${socket.id} joined instance ${currentInstance.id}`);
+  console.log(currentInstance.coins)
+ 
 
-  backendplayers[socket.id] = {
+  currentInstance.players[socket.id] = {
     x: Math.random() * 500,
     y: Math.random() * 500,
     color: `hsl(${Math.random() * 360},100%,50%)`,
     sequencenumber: 0,
     score: 0,
-    vel:10
+    vel: 10,
+    radius: 10,
+    isdouble: false
+  };
+
+  console.log(currentInstance.players)
+
+
+  // Check if the player count is 3 to start the countdown
+  if (Object.keys(currentInstance.players).length === 3) {
+    let countdown = 5;
+    currentInstance.countdown = setInterval(() => {
+      io.to(`instance-${currentInstance.id}`).emit('countdown', countdown);
+      countdown--;
+      if (countdown < 0) {
+        clearInterval(currentInstance.countdown);
+        io.to(`instance-${currentInstance.id}`).emit('countdown', 'Go!');
+      }
+    }, 1000);
   }
-  io.emit('updatePlayers', backendplayers)
 
 
-  // adjusting players radius acc to device pixel ratio
+  io.to(`instance-${currentInstance.id}`).emit('updatePlayers', currentInstance.players);
+
+  // Adjusting players radius according to device pixel ratio
   socket.on('initcanvas', ({ width, height, devicepixelratio }) => {
-    backendplayers[socket.id].canvas = {
+    currentInstance.players[socket.id].canvas = {
       width,
       height
-    }
-    backendplayers[socket.id].radius = 10
+    };
+    currentInstance.players[socket.id].radius = 10;
     if (devicepixelratio > 1) {
-      backendplayers[socket.id].radius = 2 * 10
+      currentInstance.players[socket.id].radius = 20;
     }
-  })
-
+  });
 
   socket.on('placePowerUp', ({ type, x, y }) => {
-    powerupid++
-    backendpowerups[powerupid] = { type, x, y }
-  })
+    currentInstance.powerUpId++;
+    currentInstance.powerUps[currentInstance.powerUpId] = { type, x, y };
+  });
 
   socket.on('disconnect', (reason) => {
-    delete backendplayers[socket.id]
-    io.emit('updateplayers', backendplayers)
-  })
-
+    delete currentInstance.players[socket.id];
+    io.to(`instance-${currentInstance.id}`).emit('updatePlayers', currentInstance.players);
+    if (Object.keys(currentInstance.players).length === 0) {
+      clearInterval(currentInstance.coinSpawnInterval);
+      instances.splice(instances.indexOf(currentInstance), 1);
+    }
+  });
 
   socket.on('keydown', ({ keycode, sequencenumber }) => {
-    backendplayers[socket.id].sequencenumber = sequencenumber
+    currentInstance.players[socket.id].sequencenumber = sequencenumber;
     switch (keycode) {
       case 'KeyW':
-        backendplayers[socket.id].y -= backendplayers[socket.id].vel
-        break
+        currentInstance.players[socket.id].y -= currentInstance.players[socket.id].vel;
+        break;
       case 'KeyA':
-        backendplayers[socket.id].x -= backendplayers[socket.id].vel
-        break
+        currentInstance.players[socket.id].x -= currentInstance.players[socket.id].vel;
+        break;
       case 'KeyS':
-        backendplayers[socket.id].y += backendplayers[socket.id].vel
-        break
+        currentInstance.players[socket.id].y += currentInstance.players[socket.id].vel;
+        break;
       case 'KeyD':
-        backendplayers[socket.id].x += backendplayers[socket.id].vel
-        break
+        currentInstance.players[socket.id].x += currentInstance.players[socket.id].vel;
+        break;
     }
-  })
+  });
 
-  console.log(backendplayers)
-})
+  socket.join(`instance-${currentInstance.id}`);
+});
 
 setInterval(() => {
-  
-  for(const playerid in backendplayers){
-    for (const coinid in backendcoins) {
-      const backendplayer = backendplayers[playerid]
-      const coin = backendcoins[coinid]
-      const distance = Math.hypot(
-        backendplayer.x - coin.x,
-        backendplayer.y - coin.y
-      )
-      if (
-        distance <= backendplayer.radius + coinradius 
-        
-      ) {
-        const cond=backendplayers[playerid].isdouble
-        const inc = coin.colornum%10
-        if(inc<=3){
-          if(cond){
-            backendplayers[playerid].score +=20
-            backendplayers[playerid].isdouble=false
-          }
-          else{
-            backendplayers[playerid].score +=10
-          }          
-        }
-        else if(inc>3 && inc<=6){
-          if(cond){
-            backendplayers[playerid].score +=40
-            backendplayers[playerid].isdouble=false
-          }
-          else{
-            backendplayers[playerid].score +=20
-          }  
-        }
-        else if(inc>6 && inc<=8) {
-          if(cond){
-            backendplayers[playerid].score +=100
-            backendplayers[playerid].isdouble=false
-          }
-          else{
-            backendplayers[playerid].score +=50
-          }  
-        }
-        else{
-          backendplayers[playerid].isdouble=true
-        }
+  instances.forEach((instance) => {
+    for (const playerId in instance.players) {
+      const player = instance.players[playerId];
 
-        delete backendcoins[coinid]
+      for (const coinId in instance.coins) {
+        const coin = instance.coins[coinId];
+        const distance = Math.hypot(player.x - coin.x, player.y - coin.y);
+        if (distance <= player.radius + instance.coinRadius) {
+          const cond = player.isdouble;
+          const inc = coin.colornum % 10;
+          if (inc <= 3) {
+            if (cond) {
+              player.score += 20;
+              player.isdouble = false;
+            } else {
+              player.score += 10;
+            }
+          } else if (inc > 3 && inc <= 6) {
+            if (cond) {
+              player.score += 40;
+              player.isdouble = false;
+            } else {
+              player.score += 20;
+            }
+          } else if (inc > 6 && inc <= 8) {
+            if (cond) {
+              player.score += 100;
+              player.isdouble = false;
+            } else {
+              player.score += 50;
+            }
+          } else {
+            player.isdouble = true;
+          }
 
-        
-        break
+          delete instance.coins[coinId];
+          break;
+        }
+      }
+
+      for (const powerUpId in instance.powerUps) {
+        const powerUp = instance.powerUps[powerUpId];
+        const distance = Math.hypot(player.x - powerUp.x, player.y - powerUp.y);
+        if (distance <= player.radius + instance.powerUpRadius) {
+          if (powerUp.type === 'speed') {
+            player.vel = 25;
+            setTimeout(() => {
+              player.vel = 10;
+            }, 10000);
+          } else if (powerUp.type === 'slow') {
+            player.vel = 3;
+            setTimeout(() => {
+              player.vel = 10;
+            }, 10000);
+          } else if (powerUp.type === 'freeze') {
+            player.vel = 0;
+            setTimeout(() => {
+              player.vel = 10;
+            }, 10000);
+          }
+          delete instance.powerUps[powerUpId];
+          break;
+        }
       }
     }
 
-
-    for (const powerupid in backendpowerups) {
-      const backendplayer = backendplayers[playerid]
-      const powerup = backendpowerups[powerupid]
-      const distance = Math.hypot(backendplayer.x - powerup.x, backendplayer.y - powerup.y)
-      if (distance <= backendplayer.radius + powerupradius) {
-        if (powerup.type === 'speed') {
-          backendplayers[playerid].vel = 25
-          setInterval(() => {
-            backendplayers[playerid].vel = 10
-          }, 10000);
-        } else if (powerup.type === 'slow') {
-          backendplayers[playerid].vel = 3
-          setInterval(() => {
-            backendplayers[playerid].vel = 10
-          }, 10000);
-        } else if (powerup.type === 'freeze') {
-          backendplayers[playerid].vel = 0
-          setInterval(() => {
-            backendplayers[playerid].vel = 10
-          }, 10000);
-        }
-        delete backendpowerups[powerupid]
-        break
-      }
-    }
-
-  }
-
-  io.emit('updatePlayers', backendplayers)
-  io.emit('updatecoins',backendcoins)
-  io.emit('updatePowerUps',backendpowerups)
-}, 15)
-
+    io.to(`instance-${instance.id}`).emit('updatePlayers', instance.players);
+    io.to(`instance-${instance.id}`).emit('updateCoins', instance.coins);
+    io.to(`instance-${instance.id}`).emit('updatePowerUps', instance.powerUps);
+  });
+}, 15);
 
 server.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Example app listening on port ${port}`);
+});
