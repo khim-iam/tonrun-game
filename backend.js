@@ -1,3 +1,4 @@
+const { count } = require('console');
 const express = require('express');
 // const cors = require('cors');
 
@@ -38,7 +39,7 @@ const createInstance = () => {
   };
 
   instance.coinSpawnInterval = setInterval(() => {
-    if (Object.keys(instance.players).length > 2) {
+    if (Object.keys(instance.players).length > 2 ) {
       instance.coinId++;
       instance.coins[instance.coinId] = {
         x: 100 + Math.random() * 1600,
@@ -63,6 +64,7 @@ const createInstance = () => {
 };
 
 io.on('connection', (socket) => {
+  
   let currentInstance;
 
   if (instances.length === 0 || Object.keys(instances[instances.length - 1].players).length === 3) {
@@ -76,12 +78,12 @@ io.on('connection', (socket) => {
  
 
   currentInstance.players[socket.id] = {
-    x: Math.random() * 500,
-    y: Math.random() * 500,
+    x: -100,
+    y: -100,
     color: `hsl(${Math.random() * 360},100%,50%)`,
     sequencenumber: 0,
     score: 0,
-    vel: 10,
+    vel: 0,
     radius: 10,
     isdouble: false
   };
@@ -95,7 +97,13 @@ io.on('connection', (socket) => {
     currentInstance.countdown = setInterval(() => {
       io.to(`instance-${currentInstance.id}`).emit('countdown', countdown);
       countdown--;
+      // if(countdown===0){
+      //   currentInstance.spawn=true
+      // }
       if (countdown < 0) {
+        for (const playerId in currentInstance.players) {
+          currentInstance.players[playerId].vel = 10; // Set player velocity to 10
+        }
         clearInterval(currentInstance.countdown);
         io.to(`instance-${currentInstance.id}`).emit('countdown', 'Go!');
       }
@@ -107,10 +115,17 @@ io.on('connection', (socket) => {
 
   // Adjusting players radius according to device pixel ratio
   socket.on('initcanvas', ({ width, height, devicepixelratio }) => {
+    const playerPositions = [
+      { x: 0, y: -200 },
+      { x: -173, y: 100 },
+      { x: 173, y: 100 }
+    ];
     currentInstance.players[socket.id].canvas = {
       width,
       height
     };
+    currentInstance.players[socket.id].x=width/2 + playerPositions[Object.keys(currentInstance.players).length-1].x
+    currentInstance.players[socket.id].y=height/2 + playerPositions[Object.keys(currentInstance.players).length-1].y
     currentInstance.players[socket.id].radius = 10;
     if (devicepixelratio > 1) {
       currentInstance.players[socket.id].radius = 20;
