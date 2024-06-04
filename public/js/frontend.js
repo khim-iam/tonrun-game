@@ -22,7 +22,6 @@ const powerupused = {
 };
 
 
-
 const countdownElement = document.getElementById('countdown');
 
 socket.on('countdown', (countdown) => {
@@ -31,10 +30,35 @@ socket.on('countdown', (countdown) => {
     setTimeout(() => {
       countdownElement.innerText = '';
     }, 1000);
+  }
+  else if(countdown==='Stop!'){
+    countdownElement.innerText = countdown;
+    setTimeout(() => {
+      countdownElement.innerText = '';
+      document.querySelector('#endpop').style.display="block"
+    }, 1000);
   } else {
     countdownElement.innerText = countdown;
   }
 });
+
+
+// socket.on('countdownend', (countdown) => {
+//   if (countdown === 'Stop!') {
+//     countdownElement.innerText = countdown;
+//     setTimeout(() => {
+//       countdownElement.innerText = '';
+//       document.querySelector('#endpop').style.display="block"
+//     }, 1000);
+//   } else {
+//     countdownElement.innerText = countdown;
+//   }
+// });
+
+
+// socket.on('endgame',()=>{
+//   document.querySelector('#endpop').style.display="block"
+// })
 
 
 
@@ -79,7 +103,52 @@ socket.on('updatePowerUps', (backendpowerups) => {
   }
 });
 
-socket.on('connect', () => {
+// socket.on('connect', () => {
+//   const league = prompt('Enter league (1, 2, or 3):');
+//   socket.emit('selectLeague', league);
+//   socket.emit('initcanvas', {
+//     width: canvas.width,
+//     height: canvas.height,
+//     devicepixelratio
+//   });
+// });
+
+
+
+
+// Working but with bugs - so metimes taking null league
+// socket.on('connect', async () => {
+//   const selectLeague = async () => {
+//     return new Promise((resolve) => {
+//       const league = prompt('Enter league (1, 2, or 3):');
+//       resolve(league);
+//     });
+//   };
+
+//   const league = await selectLeague();
+//   socket.emit('selectLeague', league);
+
+//   socket.emit('initcanvas', {
+//     width: canvas.width,
+//     height: canvas.height,
+//     devicepixelratio
+//   });
+// });
+
+socket.on('connect', async () => {
+  const selectLeague = async () => {
+    return new Promise((resolve) => {
+      let league = null;
+      while (!league || !['1', '2', '3'].includes(league)) {
+        league = prompt('Enter league (1, 2, or 3):');
+      }
+      resolve(league);
+    });
+  };
+
+  const league = await selectLeague();
+  socket.emit('selectLeague', league);
+
   socket.emit('initcanvas', {
     width: canvas.width,
     height: canvas.height,
@@ -90,7 +159,7 @@ socket.on('connect', () => {
 const colorarr = ['gray', 'gray', 'gray', 'gray', 'yellow', 'yellow', 'yellow', 'green', 'green', 'cyan'];
 
 socket.on('updateCoins', (backendcoins) => {
-  console.log(1000000)
+  //console.log(1000000)
   for (const id in backendcoins) {
     const coin = backendcoins[id];
     if (!frontendcoins[id]) {
@@ -258,5 +327,5 @@ window.addEventListener('keyup', (e) => {
 });
 
 setInterval(() => {
-  console.log(frontendcoins)
+  console.log(frontendplayers)
 }, 5000);
