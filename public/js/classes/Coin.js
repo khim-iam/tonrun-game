@@ -5,13 +5,13 @@ class Coin {
       this.radius = radius
       this.image = new Image();
       if(color==='gray'){
-        this.image.src = '../img/silver.jpg';
+        this.image.src = '../img/p1.png';
       }
       else if(color==='yellow'){
-        this.image.src = '../img/gold.jpg';
+        this.image.src = '../img/p2.png';
       }
       else if(color==='green'){
-        this.image.src = '../img/diamond.png';
+        this.image.src = '../img/p3.png';
       }
       else{
         this.image.src = '../img/ton.png';

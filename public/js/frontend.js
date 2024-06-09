@@ -186,7 +186,8 @@ socket.on('updatePlayers', (backendplayers) => {
         x: backendplayer.x,
         y: backendplayer.y,
         radius: 10,
-        color: backendplayer.color
+        color: backendplayer.color,
+        num:backendplayer.num
       });
       document.querySelector('#playerlabels').innerHTML += `<div data-id="${id}" data-score="${backendplayer.score}">${id} :${backendplayer.score} </div>`;
     } else {

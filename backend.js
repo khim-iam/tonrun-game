@@ -33,7 +33,7 @@ const createInstance = (league) => {
   }
 
   instance.coinSpawnInterval = setInterval(() => {
-    if (Object.keys(instance.players).length > 2) {
+    if (Object.keys(instance.players).length > 1) {
       instance.coinId++
       instance.coins[instance.coinId] = {
         x: 100 + Math.random() * 1600,
@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
     currentInstance = instances.find(
       (instance) =>
         instance.league === playerLeague &&
-        Object.keys(instance.players).length < 3
+        Object.keys(instance.players).length < 1
     )
 
     // If no instance is found, create a new one
@@ -90,10 +90,11 @@ io.on('connection', (socket) => {
       score: 0,
       vel: 0,
       radius: 10,
-      isdouble: false
+      isdouble: false,
+      num:Object.keys(currentInstance.players).length
     }
 
-    if (Object.keys(currentInstance.players).length === 3) {
+    if (Object.keys(currentInstance.players).length === 2) {
       let countdown = 5
       currentInstance.countdown = setInterval(() => {
         io.to(`instance-${currentInstance.id}`).emit('countdown', countdown)
