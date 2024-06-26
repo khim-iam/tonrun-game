@@ -33,11 +33,11 @@ const createInstance = (league) => {
   }
 
   instance.coinSpawnInterval = setInterval(() => {
-    if (Object.keys(instance.players).length > 1) {
+    if (Object.keys(instance.players).length > 2) {
       instance.coinId++
       instance.coins[instance.coinId] = {
-        x: 100 + Math.random() * 1600,
-        y: 100 + Math.random() * 700,
+        x: 200 + Math.random() * 1600,
+        y: 200 + Math.random() * 600,
         colornum: Math.ceil(Math.random() * 100),
         isdouble: false
       }
@@ -51,9 +51,9 @@ const createInstance = (league) => {
         //     instance.players[playerId].vel = 0;
         //   }
         // }, 4000);
-      }, 13000)
+      }, 300000)
     }
-  }, 2000)
+  }, 4000)
 
   instances.push(instance)
   return instance
@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
     currentInstance = instances.find(
       (instance) =>
         instance.league === playerLeague &&
-        Object.keys(instance.players).length < 1
+        Object.keys(instance.players).length < 3
     )
 
     // If no instance is found, create a new one
@@ -83,18 +83,18 @@ io.on('connection', (socket) => {
     )
 
     currentInstance.players[socket.id] = {
-      x: 500 * Math.random(),
-      y: 500 * Math.random(),
+      x: 500 + 500 * Math.random(),
+      y: 400 + 500 * Math.random(),
       color: `hsl(${Math.random() * 360},100%,50%)`,
       sequencenumber: 0,
       score: 0,
       vel: 0,
-      radius: 10,
+      radius: 20,
       isdouble: false,
       num:Object.keys(currentInstance.players).length
     }
 
-    if (Object.keys(currentInstance.players).length === 2) {
+    if (Object.keys(currentInstance.players).length === 3) {
       let countdown = 5
       currentInstance.countdown = setInterval(() => {
         io.to(`instance-${currentInstance.id}`).emit('countdown', countdown)
@@ -113,7 +113,7 @@ io.on('connection', (socket) => {
           for (const playerId in currentInstance.players) {
             currentInstance.players[playerId].vel = 0;
           }
-      }, 16000);
+      }, 302000);
     }
 
     io.to(`instance-${currentInstance.id}`).emit(

@@ -11,6 +11,9 @@ canvas.height = innerHeight * devicepixelratio;
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 
+const namearr=["Daksh","Kunal","Himanshu"];
+
+
 const frontendplayers = {};
 const frontendcoins = {};
 const frontendpowerups = {};
@@ -40,6 +43,20 @@ socket.on('countdown', (countdown) => {
   } else {
     countdownElement.innerText = countdown;
   }
+});
+
+
+
+
+document.querySelectorAll('.power-up').forEach(powerUp => {
+  powerUp.addEventListener('click', () => {
+      gsap.to(powerUp, {
+          duration: 0.2,
+          scale: 1.2,
+          yoyo: true,
+          repeat: 1
+      });
+  });
 });
 
 
@@ -166,7 +183,7 @@ socket.on('updateCoins', (backendcoins) => {
       frontendcoins[id] = new Coin({
         x: coin.x,
         y: coin.y,
-        radius: 15,
+        radius: 25,
         color: colorarr[(coin.colornum) % 10]
       });
     }
@@ -185,13 +202,75 @@ socket.on('updatePlayers', (backendplayers) => {
       frontendplayers[id] = new Player({
         x: backendplayer.x,
         y: backendplayer.y,
-        radius: 10,
+        radius: backendplayer.radius,
         color: backendplayer.color,
         num:backendplayer.num
       });
-      document.querySelector('#playerlabels').innerHTML += `<div data-id="${id}" data-score="${backendplayer.score}">${id} :${backendplayer.score} </div>`;
+      
+      //document.querySelector('#playerlabels').innerHTML += `<div data-id="${id}" data-score="${backendplayer.score}">${id} :${backendplayer.score} </div>`;
+      // const playerLabelHTML = `
+      //   <div class="scorecard" data-id="${id}">
+      //     <div class="circle"></div>
+      //     <div class="username">${id}</div>
+      //     <div class="score">${backendplayer.score}</div>
+      //   </div>`;
+      // document.querySelector('#playerlabels').innerHTML += playerLabelHTML;
+
+      
+
+
+      const playerLabelHTML = `
+        <div class="scorecard" data-id="${id}">
+          <div class="circle">
+            <span class="score">${backendplayer.score}</span>
+          </div>
+          <div class="username">${namearr[backendplayer.num]}</div>
+        </div>`;
+      document.querySelector('#playerlabels').innerHTML += playerLabelHTML;
+      console.log(namearr[backendplayer.num])
+    
     } else {
-      document.querySelector(`div[data-id=${id}]`).innerHTML = `${id} :${backendplayer.score}`;
+      // document.querySelector(`div[data-id=${id}]`).innerHTML = `${id} :${backendplayer.score}`;
+      // if (id === socket.id) {
+      //   frontendplayers[id].x = backendplayer.x;
+      //   frontendplayers[id].y = backendplayer.y;
+
+      //   const lastbackendinputindex = playerinputs.findIndex((input) => backendplayer.sequencenumber === input.sequencenumber);
+
+      //   if (lastbackendinputindex > -1) {
+      //     playerinputs.splice(0, lastbackendinputindex + 1);
+      //   }
+
+      //   playerinputs.forEach((input) => {
+      //     frontendplayers[id].x += input.dx;
+      //     frontendplayers[id].y += input.dy;
+      //   });
+
+
+      // const playerLabel = document.querySelector(`.scorecard[data-id=${id}]`);
+      // playerLabel.querySelector('.username').innerText = id;
+      // playerLabel.querySelector('.score').innerText = backendplayer.score;
+
+      // if (id === socket.id) {
+      //   frontendplayers[id].x = backendplayer.x;
+      //   frontendplayers[id].y = backendplayer.y;
+
+      //   const lastbackendinputindex = playerinputs.findIndex((input) => backendplayer.sequencenumber === input.sequencenumber);
+
+      //   if (lastbackendinputindex > -1) {
+      //     playerinputs.splice(0, lastbackendinputindex + 1);
+      //   }
+
+      //   playerinputs.forEach((input) => {
+      //     frontendplayers[id].x += input.dx;
+      //     frontendplayers[id].y += input.dy;
+      //   });
+
+
+      const playerLabel = document.querySelector(`.scorecard[data-id="${id}"]`);
+      playerLabel.querySelector('.username').innerText = namearr[backendplayer.num];
+      playerLabel.querySelector('.score').innerText = backendplayer.score;
+
       if (id === socket.id) {
         frontendplayers[id].x = backendplayer.x;
         frontendplayers[id].y = backendplayer.y;
@@ -206,6 +285,8 @@ socket.on('updatePlayers', (backendplayers) => {
           frontendplayers[id].x += input.dx;
           frontendplayers[id].y += input.dy;
         });
+
+
       } else {
         frontendplayers[id].x = backendplayer.x;
         frontendplayers[id].y = backendplayer.y;
@@ -233,8 +314,9 @@ let animationId;
 
 function animate() {
   animationId = requestAnimationFrame(animate);
-  c.fillStyle = 'rgba(0, 0, 0, 0.1)';
-  c.fillRect(0, 0, canvas.width, canvas.height);
+  //c.fillStyle = 'rgba(0, 0, 0, 0.1)';
+  //c.fillRect(0, 0, canvas.width, canvas.height);
+  c.clearRect(0, 0, canvas.width, canvas.height);
 
   for (const id in frontendplayers) {
     frontendplayers[id].draw();
@@ -247,6 +329,8 @@ function animate() {
   for (const id in frontendpowerups) {
     frontendpowerups[id].draw();
   }
+
+  canvas.style.backgroundImage= 1
 }
 
 animate();
