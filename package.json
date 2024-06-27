@@ -1,5 +1,14 @@
 {
-
+  "name": "tonrun-game",
+  "version": "1.0.0",
+  "description": "Your project description",
+  "main": "index.js",
+  "scripts": {
+    "start": "http-server -p 3001 --cors",
+    "deploy": "gh-pages -d public" 
+  },
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
@@ -8,12 +17,5 @@
   },
   "devDependencies": {
     "gh-pages": "^6.1.1"
-  },
-
-"scripts": {
-  "deploy": "gh-pages -d public" 
-}
-
-
-  
+  }
 }
