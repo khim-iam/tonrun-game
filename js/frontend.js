@@ -517,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   
       animate();
-  
+      
       const keys = {
         w: { pressed: false },
         a: { pressed: false },
