@@ -44,7 +44,7 @@ class Powerup {
       if (this.imageLoaded) {
         c.save();
 
-        // Create a circular clipping path
+        // Create a circular clipping path.
         c.beginPath();
         c.arc(this.x, this.y, this.radius * window.devicePixelRatio, 0, Math.PI * 2, false);
         c.clip();
