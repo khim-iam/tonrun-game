@@ -2,7 +2,6 @@
   "name": "tonrun-game",
   "version": "1.0.0",
   "description": "Your project description",
-  "main": "index.js",
   "scripts": {
     "start": "http-server -p 3001 --cors",
     "deploy": "gh-pages -d public" 
