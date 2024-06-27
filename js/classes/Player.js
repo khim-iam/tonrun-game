@@ -7,13 +7,13 @@ class Player {
     // this.context = context; // Add context to the Player class
     this.image = new Image();
       if(num===0){
-        this.image.src = '../../img/UFO/1.png';
+        this.image.src = '../../1.png';
       }
       else if(num===1){
-        this.image.src = '../../img/UFO/2.png';
+        this.image.src = '../../2.png';
       }
       else{
-        this.image.src = '../../img/UFO/3.png';
+        this.image.src = '../../3.png';
       }
         this.imageLoaded = false;
 
