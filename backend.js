@@ -1,18 +1,30 @@
 const express = require('express')
 const http = require('http')
 const { emit } = require('process')
+const cors = require('cors'); // Import cors
 const { Server } = require('socket.io')
+
 
 const app = express()
 const server = http.createServer(app)
-const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000 })
+// const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000 })
+const io = new Server(server, {
+  cors: {
+    origin: "http://10.9.102.146:3001", // Replace with your frontend port
+    // origin: "http://192.168.56.1:3001", // Use the frontend server address
+    methods: ["GET", "POST"]
+  },
+  pingInterval: 2000,
+  pingTimeout: 5000
+});
 const port = 3000
 
-app.use(express.static('public'))
+app.use(cors()); // Use cors middleware
+// app.use(express.static('public'))
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html')
-})
+// app.get('/', (req, res) => {
+//   res.sendFile(__dirname + '/index.html')
+// })
 
 const instances = []
 let instanceIdCounter = 0
