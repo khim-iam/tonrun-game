@@ -10,14 +10,17 @@ const server = http.createServer(app)
 // const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000 })
 const io = new Server(server, {
   cors: {
-    origin: "http://10.9.102.146:3001", // Replace with your frontend port
+    // origin: "http://10.9.102.146:3001", // Replace with your frontend port
     // origin: "http://192.168.56.1:3001", // Use the frontend server address
+    origin: process.env.FRONTEND_URL || "http://localhost:3001", // Use environment variable or default to localhost
     methods: ["GET", "POST"]
   },
   pingInterval: 2000,
   pingTimeout: 5000
 });
-const port = 3000
+// const port = 3000
+const port = process.env.PORT || 3000; // Use environment variable or default to 3000
+
 
 app.use(cors()); // Use cors middleware
 // app.use(express.static('public'))
