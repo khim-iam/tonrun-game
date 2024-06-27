@@ -298,7 +298,8 @@
 //     });
 //   });
   
-
+const canvas = document.querySelector('canvas');
+const c = canvas.getContext('2d');
 
 document.addEventListener('DOMContentLoaded', () => {
     const landingPage = document.getElementById('landing-page');
@@ -313,8 +314,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const socket = io('https://tonrun-game-production.up.railway.app'); // Connect to the deployed backend
 
   
-      const canvas = document.querySelector('canvas');
-      const c = canvas.getContext('2d');
+    //   const canvas = document.querySelector('canvas');
+    //   const c = canvas.getContext('2d');
       const devicepixelratio = window.devicePixelRatio || 1;
   
       canvas.width = innerWidth * devicepixelratio;
