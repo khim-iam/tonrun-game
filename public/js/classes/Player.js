@@ -6,15 +6,13 @@ class Player {
     this.radius = radius
     // this.context = context; // Add context to the Player class
     this.image = new Image();
-      if(num===0){
-        this.image.src = '../../1.png';
-      }
-      else if(num===1){
-        this.image.src = '../../2.png';
-      }
-      else{
-        this.image.src = '../../3.png';
-      }
+    if (num === 0) {
+      this.image.src = '/tonrun-game/img/UFO/1.png';  // Update path
+    } else if (num === 1) {
+      this.image.src = '/tonrun-game/img/UFO/2.png';  // Update path
+    } else {
+      this.image.src = '/tonrun-game/img/UFO/3.png';  // Update path
+    }
         this.imageLoaded = false;
 
         // Ensure the image is fully loaded before drawing it
