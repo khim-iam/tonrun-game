@@ -286,7 +286,7 @@ const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:3001", "https://khim-iam.github.io"];
+const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:3001", "https://khim-iam.github.io","http://10.9.102.146:3001"];
 
 // Configure CORS for Express
 app.use(cors({
