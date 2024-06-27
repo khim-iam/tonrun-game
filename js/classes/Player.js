@@ -1,10 +1,10 @@
 
 class Player {
-  constructor({x, y, radius, color,num, context}) {
+  constructor({x, y, radius, color,num}) {
     this.x = x
     this.y = y
     this.radius = radius
-    this.context = context; // Add context to the Player class
+    // this.context = context; // Add context to the Player class
     this.image = new Image();
       if(num===0){
         this.image.src = '../../img/UFO/1.png';
@@ -25,7 +25,7 @@ class Player {
   
 
   draw() {
-    const c = this.context; // Use the context from the class property
+    // const c = this.context; // Use the context from the class property
     if (this.imageLoaded) {
       c.save();
 
