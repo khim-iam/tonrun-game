@@ -51,6 +51,13 @@
       document.getElementById('landing-page').style.display = 'none';
       document.getElementById('everything').style.display = 'block';
 
+      // Lock screen orientation to landscape-primary
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape-primary').catch(function(error) {
+          console.error('Screen orientation lock failed: ', error);
+        });
+      }
+
       // Dynamically load scripts
       const scripts = [
         "https://cdn.socket.io/4.6.1/socket.io.min.js",

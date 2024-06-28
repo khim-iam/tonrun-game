@@ -315,8 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const c = canvas.getContext('2d');
 
       
-      const socket = io('http://192.168.56.1:3000'); // Connect to the backend running on port 3000
-    //   const socket = io('https://tonrun-game-production.up.railway.app'); // Connect to the deployed backend
+      // const socket = io('http://192.168.56.1:3000'); // Connect to the backend running on port 3000
+      const socket = io('https://tonrun-game-production.up.railway.app'); // Connect to the deployed backend
 
   
     //   const canvas = document.querySelector('canvas');
