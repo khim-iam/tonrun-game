@@ -1,8 +1,10 @@
+
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
 // const socket = io();
-// const socket = io('http://192.168.56.1:3000');
+// const socket = io('http://127.0.0.1:3000');
+// const socket = io('http://192.168.156.111:3000');
 const socket = io('https://tonrun-game-production.up.railway.app');
 // const socket = io('process.env.BACKEND_URL');
 
@@ -157,19 +159,39 @@ socket.on('updatePowerUps', (backendpowerups) => {
 //   });
 // });
 
-socket.on('connect', async () => {
-  const selectLeague = async () => {
-    return new Promise((resolve) => {
-      let league = null;
-      while (!league || !['1', '2', '3'].includes(league)) {
-        league = prompt('Enter league (1, 2, or 3):');
-      }
-      resolve(league);
-    });
-  };
 
-  const league = await selectLeague();
-  socket.emit('selectLeague', league);
+// const username = window.username;
+// const selectedValue = window.selectedValue;
+// Use these variables as needed in your script
+const backendInput ={
+  username : window.username,
+  selectedValue : window.selectedValue
+}
+socket.on('connect', () => {
+  // socket.on('connect', async () => {
+
+  // const selectLeague = async () => {
+  //   return new Promise((resolve) => {
+  //     let league = null;
+  //     while (!league || !['1', '2', '3'].includes(league)) {
+  //       league = prompt('Enter league (1, 2, or 3):');
+  //       // league = selectedValue;
+  //     }
+  //     resolve(league);
+  //   });
+  // };
+
+  // const backendInput ={
+  //   username : window.username,
+  //   selectedValue : window.selectedValue
+  // }
+  
+  
+  // const league = await selectLeague();
+  // socket.emit('selectLeague', league);
+
+  socket.emit('selectLeague', backendInput);
+
 
   socket.emit('initcanvas', {
     width: canvas.width,

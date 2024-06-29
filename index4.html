@@ -1,0 +1,376 @@
+ <!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+  <div id="landing-page" class="landing-page">
+    <h1>Welcome to TONRUN</h1>
+    <button id="play-button">Play</button>
+  </div>
+
+  <div id="everything" class="everything" style="display: none;">
+
+
+  <div style="position: absolute; color: white; padding: 15px; font-family: sans-serif; font-size: 14px; user-select: none; background: transparent; top:10px;">
+    <div id="playerlabels"></div>
+  </div>
+
+  <canvas></canvas>
+  <div class="power-up-container">
+    <div class="power-up" data-type="speed"></div>
+    <div class="power-up" data-type="slow"></div>
+    <div class="power-up" data-type="freeze"></div>
+  </div>
+  <div id="countdown" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; color: white;"></div>
+  <div id="endpop">
+    <button>Play Again</button>
+  </div>
+  <div class="joystick">
+    <div class="base"></div>
+    <div class="stick"></div>
+  </div>
+
+
+  </div>
+
+
+  <script>
+    document.getElementById('play-button').addEventListener('click', function() {
+      document.getElementById('landing-page').style.display = 'none';
+      document.getElementById('everything').style.display = 'block';
+
+      // Lock screen orientation to landscape-primary
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape-primary').catch(function(error) {
+          console.error('Screen orientation lock failed: ', error);
+        });
+      }
+
+      // Dynamically load scripts
+      const scripts = [
+        "https://cdn.socket.io/4.6.1/socket.io.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js",
+        "/tonrun-game/js/classes/Coin.js",  // Update path
+          "/tonrun-game/js/classes/Player.js",  // Update path
+          "/tonrun-game/js/classes/PowerUp.js",  // Update path
+          "/tonrun-game/js/frontend.js",  // Update path
+          "/tonrun-game/js/joystick.js"  // Update path
+        // "./js/classes/Coin.js",
+        // "./js/classes/Player.js",
+        // "./js/classes/PowerUp.js",
+        // "./js/frontend.js",
+        // "./js/joystick.js"
+      ];
+
+      scripts.forEach(src => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = false;
+        document.body.appendChild(script);
+      });
+    });
+  </script>
+
+</body>
+</html> 
+ -->
+
+
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Game</title>
+   <link rel="stylesheet" href="./styles.css">
+ </head>
+ <body>
+ 
+   <div id="landing-page" class="landing-page">
+ 
+     <div id="tonrun-logo" class="upar"></div>
+ 
+     <div class="avatar-container upar">
+       <img src="/tonrun-game/img/landing/avatar.png" alt="Avatar" class="avatar">
+       <img src="/tonrun-game/img/landing/edit-icon.png" alt="Edit Icon" class="edit-icon">
+       
+     </div>
+     <h1 id="username" class="upar">DAKSH</h1>
+ 
+    
+ 
+     <div class="swap-container upar">
+       <img src="/tonrun-game/img/landing/tonswap.png" alt="Avatar" class="tonswap sw">
+       <img src="/tonrun-game/img/landing/swap.png" alt="Edit Icon" class="swap sw">
+       <img src="/tonrun-game/img/landing/runswap.png" alt="Edit Icon" class="runswap sw">
+     </div>
+ 
+     
+ 
+     <div id="play-button" class="upar"></div>
+ 
+     <div class="twobt upar">
+       <img src="/tonrun-game/img/landing/prevgame.png"  class="prev">
+       <img src="/tonrun-game/img/landing/skinshop.png"  class="skin">
+       <img src="/tonrun-game/img/landing/battle.png"  class="battle">
+     </div>
+   </div>
+ 
+   <div id="everything" class="everything" style="display: none;width: 100vw; height: 100vh;overflow: hidden;">
+ 
+ 
+   <div style="position: absolute; color: white; padding: 15px; font-family: sans-serif; font-size: 14px; user-select: none; background: transparent; top:0px;">
+     <div id="playerlabels">
+     </div>
+   </div>
+ 
+   <canvas></canvas>
+   <div class="power-up-container">
+     <!-- <div class="power-up" data-type="speed"></div> -->
+     <div class="power-up" data-type="slow"></div>
+     <div class="power-up" data-type="freeze"></div>
+   </div>
+   <div class="power-up-container p1">
+     <div class="power-up" data-type="speed"></div>
+     <!-- <div class="power-up" data-type="slow"></div>
+     <div class="power-up" data-type="freeze"></div> -->
+   </div>
+   <div id="countdown" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; color: white;"></div>
+   <div id="endpop">
+     <button>Play Again</button>
+   </div>
+   <div class="joystick">
+     <div class="base"></div>
+     <div class="stick"></div>
+   </div>
+ 
+   <!-- <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js" integrity="sha512-kVlGhj2qFy+KBCFuvjBJTGUMxbdqJKs4yK2jh0e0VPhWUPiPC87bzm4THmaaIee3Oj7j6sDpTTgm2EPPiESqBg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+   <script src="./js/classes/Coin.js"></script>
+   <script src="./js/classes/Player.js"></script>
+   <script src="./js/classes/PowerUp.js"></script>
+   <script src="./js/frontend.js"></script>
+   <script src="./js/joystick.js"></script> -->
+ 
+   </div>
+ 
+ 
+   <script>
+     document.getElementById('play-button').addEventListener('click', function() {
+       document.getElementById('landing-page').style.display = 'none';
+       document.getElementById('everything').style.display = 'block';
+ 
+       // Lock screen orientation to landscape-primary
+       if (screen.orientation && screen.orientation.lock) {
+         screen.orientation.lock('landscape-primary').catch(function(error) {
+           console.error('Screen orientation lock failed: ', error);
+         });
+       }
+ 
+       // Dynamically load scripts
+       const scripts = [
+         "https://cdn.socket.io/4.6.1/socket.io.min.js",
+         "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js",
+        //  "/tonrun-game/js/classes/Coin.js",  // Update path
+        //    "/tonrun-game/js/classes/Player.js",  // Update path
+        //    "/tonrun-game/js/classes/PowerUp.js",  // Update path
+        //    "/tonrun-game/js/frontend.js",  // Update path
+        //    "/tonrun-game/js/joystick.js"  // Update path
+         "./js/classes/Coin.js",
+         "./js/classes/Player.js",
+         "./js/classes/PowerUp.js",
+         "./js/frontend.js",
+         "./js/joystick.js"
+       ];
+ 
+       scripts.forEach(src => {
+         const script = document.createElement('script');
+         script.src = src;
+         script.async = false;
+         document.body.appendChild(script);
+       });
+     });
+   </script>
+   <!-- <script>
+     document.addEventListener('DOMContentLoaded', () => {
+     const stick = document.querySelector('.joystick .stick');
+     let isDragging = false;
+   
+     stick.addEventListener('mousedown', (e) => {
+       isDragging = true;
+       document.addEventListener('mousemove', onMouseMove);
+       document.addEventListener('mouseup', onMouseUp);
+     });
+   
+     function onMouseMove(e) {
+       if (isDragging) {
+         const rect = stick.parentNode.getBoundingClientRect();
+         const x = e.clientX - rect.left - rect.width / 2;
+         const y = e.clientY - rect.top - rect.height / 2;
+         const angle = Math.atan2(y, x);
+         const distance = Math.min(30, Math.sqrt(x * x + y * y));
+         stick.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+       }
+     }
+   
+     function onMouseUp() {
+       isDragging = false;
+       stick.style.transform = 'translate(0, 0)';
+       document.removeEventListener('mousemove', onMouseMove);
+       document.removeEventListener('mouseup', onMouseUp);
+     }
+   });
+   </script> -->
+ 
+ 
+   <!-- <script>
+     document.addEventListener('DOMContentLoaded', () => {
+       
+ 
+ 
+       const stick = document.querySelector('.joystick .stick');
+       let isDragging = false;
+       const joystickCenter = { x: 0, y: 0 };
+     
+       stick.addEventListener('mousedown', (e) => {
+         isDragging = true;
+         document.addEventListener('mousemove', onMouseMove);
+         document.addEventListener('mouseup', onMouseUp);
+       });
+     
+       function onMouseMove(e) {
+         if (isDragging) {
+           const rect = stick.parentNode.getBoundingClientRect();
+           const x = e.clientX - rect.left - rect.width / 2;
+           const y = e.clientY - rect.top - rect.height / 2;
+           const angle = Math.atan2(y, x);
+           const distance = Math.min(30, Math.sqrt(x * x + y * y));
+           stick.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+           updateKeysBasedOnJoystick(x, y);
+         }
+       }
+     
+       function onMouseUp() {
+         isDragging = false;
+         stick.style.transform = 'translate(0, 0)';
+         resetKeys();
+         document.removeEventListener('mousemove', onMouseMove);
+         document.removeEventListener('mouseup', onMouseUp);
+       }
+     
+       function updateKeysBasedOnJoystick(x, y) {
+         const threshold = 5; // You can adjust this value to fine-tune the sensitivity
+         keys.w.pressed = y < -threshold;
+         keys.a.pressed = x < -threshold;
+         keys.s.pressed = y > threshold;
+         keys.d.pressed = x > threshold;
+     
+         // Handle diagonal movements
+         if (x < -threshold && y < -threshold) {
+           keys.w.pressed = true;
+           keys.a.pressed = true;
+         }
+         if (x > threshold && y < -threshold) {
+           keys.w.pressed = true;
+           keys.d.pressed = true;
+         }
+         if (x < -threshold && y > threshold) {
+           keys.s.pressed = true;
+           keys.a.pressed = true;
+         }
+         if (x > threshold && y > threshold) {
+           keys.s.pressed = true;
+           keys.d.pressed = true;
+         }
+       }
+     
+       function resetKeys() {
+         keys.w.pressed = false;
+         keys.a.pressed = false;
+         keys.s.pressed = false;
+         keys.d.pressed = false;
+       }
+     });
+ 
+ 
+     
+     </script> -->
+
+
+
+     <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const stick = document.querySelector('.joystick .stick');
+        let isDragging = false;
+    
+        stick.addEventListener('touchstart', (e) => {
+          isDragging = true;
+          document.addEventListener('touchmove', onTouchMove);
+          document.addEventListener('touchend', onTouchEnd);
+        });
+    
+        function onTouchMove(e) {
+          if (isDragging) {
+            const touch = e.touches[0];
+            const rect = stick.parentNode.getBoundingClientRect();
+            const x = touch.clientX - rect.left - rect.width / 2;
+            const y = touch.clientY - rect.top - rect.height / 2;
+            const angle = Math.atan2(y, x);
+            const distance = Math.min(30, Math.sqrt(x * x + y * y));
+            stick.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+            updateKeysBasedOnJoystick(x, y);
+          }
+        }
+    
+        function onTouchEnd() {
+          isDragging = false;
+          stick.style.transform = 'translate(0, 0)';
+          resetKeys();
+          document.removeEventListener('touchmove', onTouchMove);
+          document.removeEventListener('touchend', onTouchEnd);
+        }
+    
+        function updateKeysBasedOnJoystick(x, y) {
+          const threshold = 5; // Adjust this value to fine-tune sensitivity
+          keys.w.pressed = y < -threshold;
+          keys.a.pressed = x < -threshold;
+          keys.s.pressed = y > threshold;
+          keys.d.pressed = x > threshold;
+    
+          // Handle diagonal movements
+          if (x < -threshold && y < -threshold) {
+            keys.w.pressed = true;
+            keys.a.pressed = true;
+          }
+          if (x > threshold && y < -threshold) {
+            keys.w.pressed = true;
+            keys.d.pressed = true;
+          }
+          if (x < -threshold && y > threshold) {
+            keys.s.pressed = true;
+            keys.a.pressed = true;
+          }
+          if (x > threshold && y > threshold) {
+            keys.s.pressed = true;
+            keys.d.pressed = true;
+          }
+        }
+    
+        function resetKeys() {
+          keys.w.pressed = false;
+          keys.a.pressed = false;
+          keys.s.pressed = false;
+          keys.d.pressed = false;
+        }
+      });
+    </script>
+ 
+ </body>
+ </html> 
+ 
+ 
