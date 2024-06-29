@@ -286,7 +286,7 @@ const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:3001", "https://khim-iam.github.io","http://10.9.102.146:3001","http://192.168.156.111:3001"];
+const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:3001", "https://khim-iam.github.io","http://10.9.102.146:3001","http://127.0.0.1:3001","http://192.168.156.111:3001"];
 
 // Configure CORS for Express
 app.use(cors({
@@ -359,12 +359,20 @@ io.on('connection', (socket) => {
   let currentInstance;
   let playerLeague;
 
-  socket.on('selectLeague', (league) => {
-    playerLeague = league;
+  let playername;
+
+  socket.on('selectLeague', (backendInput) => {
+  // socket.on('selectLeague', (league) => {
+    // playerLeague = league;
+
+    playerLeague = backendInput.selectedValue;
+    playername = backendInput.username;
+    // console.log("backend league",obj.league, obj.username)
 
     currentInstance = instances.find(
       (instance) =>
         instance.league === playerLeague &&
+      // instance.backendInput === playerLeague &&
         Object.keys(instance.players).length < 3
     );
 
