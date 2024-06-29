@@ -2,11 +2,6 @@ const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
 // const socket = io();
-// const socket = io('http://localhost:3000'); // Replace with your backend port
-
-
-// const socket = io('http://192.168.156.111:3000');
-
 // const socket = io('http://192.168.56.1:3000');
 const socket = io('https://tonrun-game-production.up.railway.app');
 
