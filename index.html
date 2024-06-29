@@ -228,7 +228,7 @@
    </script> -->
  
  
-   <script>
+   <!-- <script>
      document.addEventListener('DOMContentLoaded', () => {
        
  
@@ -299,7 +299,76 @@
  
  
      
-     </script>
+     </script> -->
+
+
+
+     <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const stick = document.querySelector('.joystick .stick');
+        let isDragging = false;
+    
+        stick.addEventListener('touchstart', (e) => {
+          isDragging = true;
+          document.addEventListener('touchmove', onTouchMove);
+          document.addEventListener('touchend', onTouchEnd);
+        });
+    
+        function onTouchMove(e) {
+          if (isDragging) {
+            const touch = e.touches[0];
+            const rect = stick.parentNode.getBoundingClientRect();
+            const x = touch.clientX - rect.left - rect.width / 2;
+            const y = touch.clientY - rect.top - rect.height / 2;
+            const angle = Math.atan2(y, x);
+            const distance = Math.min(30, Math.sqrt(x * x + y * y));
+            stick.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+            updateKeysBasedOnJoystick(x, y);
+          }
+        }
+    
+        function onTouchEnd() {
+          isDragging = false;
+          stick.style.transform = 'translate(0, 0)';
+          resetKeys();
+          document.removeEventListener('touchmove', onTouchMove);
+          document.removeEventListener('touchend', onTouchEnd);
+        }
+    
+        function updateKeysBasedOnJoystick(x, y) {
+          const threshold = 5; // Adjust this value to fine-tune sensitivity
+          keys.w.pressed = y < -threshold;
+          keys.a.pressed = x < -threshold;
+          keys.s.pressed = y > threshold;
+          keys.d.pressed = x > threshold;
+    
+          // Handle diagonal movements
+          if (x < -threshold && y < -threshold) {
+            keys.w.pressed = true;
+            keys.a.pressed = true;
+          }
+          if (x > threshold && y < -threshold) {
+            keys.w.pressed = true;
+            keys.d.pressed = true;
+          }
+          if (x < -threshold && y > threshold) {
+            keys.s.pressed = true;
+            keys.a.pressed = true;
+          }
+          if (x > threshold && y > threshold) {
+            keys.s.pressed = true;
+            keys.d.pressed = true;
+          }
+        }
+    
+        function resetKeys() {
+          keys.w.pressed = false;
+          keys.a.pressed = false;
+          keys.s.pressed = false;
+          keys.d.pressed = false;
+        }
+      });
+    </script>
  
  </body>
  </html> 
