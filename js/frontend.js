@@ -3,8 +3,8 @@ const c = canvas.getContext('2d');
 
 // const socket = io();
 // const socket = io('http://192.168.56.1:3000');
-// const socket = io('https://tonrun-game-production.up.railway.app');
-const socket = io('process.env.BACKEND_URL');
+const socket = io('https://tonrun-game-production.up.railway.app');
+// const socket = io('process.env.BACKEND_URL');
 
 
 
