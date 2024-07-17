@@ -28,6 +28,19 @@ class Powerup {
         default:
           return '/tonrun-game/img/gold.png';  // Update path
       }
+
+      // switch (type) {
+      //   case 'speed':
+      //     return './img/speed.png';  // Update path
+      //   case 'slow':
+      //     return './img/slow.png';  // Update path
+      //   case 'freeze':
+      //     return './img/stop.png';  // Update path
+      //   default:
+      //     return './img/gold.png';  // Update path
+      // }
+
+
     }
   
     // draw() {

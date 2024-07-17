@@ -4,6 +4,7 @@ class Coin {
       this.y = y
       this.radius = radius
       this.image = new Image();
+
       if (color === 'gray') {
         this.image.src = '/tonrun-game/img/silver.png';  // Update path
       } else if (color === 'yellow') {
@@ -14,6 +15,17 @@ class Coin {
         this.radius = 15;
         this.image.src = '/tonrun-game/img/ton.png';  // Update path
       }
+      // if (color === 'gray') {
+      //   this.image.src = './img/silver.png';  // Update path
+      // } else if (color === 'yellow') {
+      //   this.image.src = './img/gold.png';  // Update path
+      // } else if (color === 'green') {
+      //   this.image.src = './img/diamond.png';  // Update path
+      // } else {
+      //   this.radius = 15;
+      //   this.image.src = './img/ton.png';  // Update path
+      // }
+
         this.imageLoaded = false;
 
         // Ensure the image is fully loaded before drawing it

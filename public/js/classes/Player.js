@@ -13,6 +13,18 @@ class Player {
     } else {
       this.image.src = '/tonrun-game/img/UFO/3.png';  // Update path
     }
+
+    // if (num === 0) {
+    //   this.image.src = './img/UFO/1.png';  // Update path
+    // } else if (num === 1) {
+    //   this.image.src = './img/UFO/2.png';  // Update path
+    // } else {
+    //   this.image.src = './img/UFO/3.png';  // Update path
+    // }
+
+
+
+
         this.imageLoaded = false;
 
         // Ensure the image is fully loaded before drawing it
