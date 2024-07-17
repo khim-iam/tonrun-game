@@ -359,12 +359,20 @@ io.on('connection', (socket) => {
   let currentInstance;
   let playerLeague;
 
-  socket.on('selectLeague', (league) => {
-    playerLeague = league;
+  let playername;
+
+  socket.on('selectLeague', (backendInput) => {
+  // socket.on('selectLeague', (league) => {
+    // playerLeague = league;
+
+    playerLeague = backendInput.selectedValue;
+    playername = backendInput.username;
+    // console.log("backend league",obj.league, obj.username)
 
     currentInstance = instances.find(
       (instance) =>
         instance.league === playerLeague &&
+      // instance.backendInput === playerLeague &&
         Object.keys(instance.players).length < 3
     );
 
